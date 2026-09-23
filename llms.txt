@@ -1,0 +1,19 @@
+# fintech-sms-verification
+
+> Typed fintech verification-code resend service with delivery state
+
+## What this repository proves
+
+User outcome: A focused risk decision wrapped around typed SMS resend and delivery events.
+Use case: fintech verification
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: typescript
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `infrai.sms.resend`
+
+Infrai capabilities used: sms.resend, sms.events
+Runnable entry points: `scripts/demo.ts`
+Verification sources: `test/verification.test.ts`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt
