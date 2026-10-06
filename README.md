@@ -1,10 +1,10 @@
 # Resending a Fintech Verification Code
 
-This minimal Node service makes a single business choice I can reason about: low-risk payments get another SMS challenge, high-risk attempts get queued for review. Infrai keeps the transport behind one key and one API, and the service stores the returned message id with delivery events that may arrive out of order depending on carrier webhook reliability.
+This small Node service makes one business decision: a low-risk payment may receive another SMS code, while a high-risk attempt is held for review. Infrai keeps the transport to one key and one API, and the service records the returned message id plus delivery events.
 
 ## The decision first
 
-`src/verification.ts` validates `{ phone, attempt, risk, paymentId }` with zod, because a schema check beats a 3am page. Attempts below three and marked `low` call `infrai.sms.resend`; every other input returns `{ status: "held" }`. The idempotency key is derived from the payment and attempt, so a retry represents the same action and won't duplicate the code unless the downstream SMS gateway fails by double-delivering, a known failure mode.
+`src/verification.ts` validates `{ phone, attempt, risk, paymentId }` with zod. Attempts below three and marked `low` call `infrai.sms.resend`; every other input returns `{ status: "held" }`. The idempotency key is derived from the payment and attempt, so a retry represents the same action.
 
 ## Run the focused check
 
@@ -13,7 +13,7 @@ npm install
 npm test
 ```
 
-The test feeds one low-risk and one high-risk payment into `shouldResend`. It expects `true`, then `false`, which is thin coverage but enough to catch a flipped risk boundary.
+The test feeds one low-risk and one high-risk payment into `shouldResend`. It expects `true`, then `false`.
 
 ## Try a live resend
 
@@ -25,11 +25,11 @@ export MESSAGE_ID=msg_existing
 npm run demo
 ```
 
-The demo prints the payment id, new `message_id`, and the delivery event response from `GET /v1/sms/events/{id}`. The client decodes Infrai's `{ ok, data, error, metadata }` envelope before deciding whether to retry or surface an error, though I'd verify the delivery timestamp against our own log given eventual consistency in carrier callbacks.
+The demo prints the payment id, new `message_id`, and the delivery event response from `GET /v1/sms/events/{id}`. The client decodes Infrai's `{ ok, data, error, metadata }` envelope before deciding whether to retry or surface an error.
 
 ## Why this shape
 
-I keep the payment rule separate from the HTTP call so the consistency boundary stays visible and testable. That makes the risk logic checkable in isolation and leaves the integration readable for a solo SaaS codebase. The only vendor-specific detail in the domain layer is the observable delivery state returned after the resend, a value that can lag or go missing if the provider drops the webhook.
+I keep the payment rule separate from the HTTP call. That makes the risk boundary testable and leaves the integration readable for a solo SaaS codebase. The only vendor-specific detail in the domain layer is the observable delivery state returned after the resend.
 
 ## License
 
@@ -37,7 +37,7 @@ MIT
 
 ## Setting up for real use: Fintech SMS Verification
 
-Quick start is above. For a real deployment you'll also need the details below, which apply to Fintech SMS Verification.
+Quick start is above. For a real deployment you'll also need: The details below apply to Fintech SMS Verification.
 
 **Account & key**
 
